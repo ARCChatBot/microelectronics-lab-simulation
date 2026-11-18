@@ -28,6 +28,9 @@ ${css}
 <script type="module">
 ${js}
 </script>
+<!-- C2C: saves results to the C2C Airtable base (server address is set in the C2C repo's c2c-connect.js) -->
+<script src="https://arcchatbot.github.io/C2C/c2c-connect.js"></script>
+<script src="c2c-bridge.js"></script>
 </body>
 </html>
 `);
