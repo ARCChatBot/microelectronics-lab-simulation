@@ -2,6 +2,8 @@
 
 A first-person 3D training simulation of a teaching cleanroom, written for high school students. Students sign in, follow one 100 mm silicon wafer through the lab, run each machine themselves, answer a short quiz at every station, and finish with a timed grade and a completion status.
 
+**Play it:** https://arcchatbot.github.io/microelectronics-lab-simulation/
+
 ## What's in it
 
 - **Ten process steps** on equipment modelled after the real thing: RCA clean, wet oxidation, spin coat, soft bake, UV exposure, develop, oxide etch, resist strip, aluminium evaporation and a four-point probe test, plus design and gowning stops.
