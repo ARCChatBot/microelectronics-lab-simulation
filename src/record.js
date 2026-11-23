@@ -3,7 +3,7 @@
 // Rules declared at publish let each student write only their own record and only the owner (and Editors) read
 // them all. Where the page cannot save (opened outside claude.ai, signed out, or without write access), everything
 // still works and the record stays in this browser, with a download of the results offered instead.
-import {PASS, QUIZ, QUIZ_TOTAL, STATIONS, STEPS, gradeOf} from './model.js';
+import {CHECK_SECONDS, PASS, QUIZ, QUIZ_TOTAL, STATIONS, STEPS, gradeOf} from './model.js';
 
 const use = (name) => (window.claude?.use ? window.claude.use(name).then((x) => x || null, () => null) : Promise.resolve(null));
 const LOCAL = 'microlab-record-v1';
@@ -106,7 +106,7 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
   const signin = el(`<div class="signin"><form class="sbox" autocomplete="off">
     <div class="ph"><i></i>STUDENT SIGN-IN</div>
     <h2>Microelectronics Lab Simulation</h2>
-    <p>Sign in so your quiz answers, grade and completion are recorded for your teacher. There is a short quiz at every station; you need ${PASS}% to complete the training.</p>
+    <p>Sign in so your quiz answers, grade and completion are recorded for your teacher. Every station ends with a timed check for understanding (${CHECK_SECONDS} seconds per question); you need ${PASS}% to complete the training.</p>
     <label for="si-name">Full name</label><input id="si-name" name="name" required maxlength="80" placeholder="First and last name">
     <div class="srow"><div><label for="si-id">Student ID</label><input id="si-id" name="sid" required maxlength="40" placeholder="e.g. 204518"></div>
     <div><label for="si-period">Class or period</label><input id="si-period" name="period" maxlength="40" placeholder="e.g. Period 3"></div></div>
@@ -194,6 +194,11 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
       status: s.status,
       history: (rec.history || []).slice(-10),
       activeSeconds: Math.round(rec.elapsed || 0),
+      questionSeconds: rec.qtime || {},
+      checks: Object.fromEntries(ORDER.map((stop) => {
+        const c = checkOf(stop);
+        return [stop, {correct: c.right, answered: c.n, of: c.of, seconds: Math.round(c.t)}];
+      })),
       stationSeconds: Object.fromEntries(Object.entries(rec.times || {}).map(([k, v]) => [k, Math.round(v)])),
     };
   }
@@ -230,52 +235,93 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
     });
   }
 
-  // ------------------------------------------------------------ the station quiz
-  const quizEl = el(`<div class="quiz" hidden><div class="qk"></div><div class="qq"></div><div class="qo"></div><div class="qf" hidden></div><div class="qb"><div class="bt qgo" hidden></div></div></div>`);
+  // ------------------------------------------------------------ the check for understanding at each station
+  // Timed and scored: CHECK_SECONDS per question on a countdown. Running out of time counts as incorrect. The time
+  // taken on every question is recorded, and the station's score and time show when its check ends.
+  const quizEl = el(`<div class="quiz" hidden><div class="qhead"><div class="qk"></div><div class="qclock"><b></b><i><s></s></i></div></div><div class="qq"></div><div class="qo"></div><div class="qf" hidden></div><div class="qb"><span class="qsum"></span><div class="bt qgo" hidden></div></div></div>`);
   root.appendChild(quizEl);
+  const clockEl = quizEl.querySelector('.qclock');
+  let live = null; // the question on the clock: {stop, i, left, reveal}
   api.needsQuiz = (stop) => !!rec && !!QUIZ[stop] && QUIZ[stop].some((_, i) => rec.answers[`${stop}:${i}`] === undefined);
+  /** The station's check score and time so far. */
+  const checkOf = (stop) => {
+    const qs = QUIZ[stop];
+    let right = 0;
+    let t = 0;
+    let n = 0;
+    qs.forEach((q, i) => {
+      const a = rec.answers[`${stop}:${i}`];
+      if (a === undefined) return;
+      n++;
+      if (a === q.answer) right++;
+      t += (rec.qtime && rec.qtime[`${stop}:${i}`]) || 0;
+    });
+    return {right, n, of: qs.length, t};
+  };
+  const drawClock = () => {
+    const left = Math.max(0, live ? live.left : 0);
+    clockEl.querySelector('b').textContent = `⏱ ${dur(Math.ceil(left))}`;
+    clockEl.querySelector('s').style.width = `${(left / CHECK_SECONDS) * 100}%`;
+    clockEl.classList.toggle('low', left <= 10);
+  };
   /** Ask the unanswered questions for this station, then call done. */
   api.quiz = (stop, done) => {
     const qs = QUIZ[stop];
     const todo = qs.map((_, i) => i).filter((i) => rec.answers[`${stop}:${i}`] === undefined);
     if (!todo.length) return done();
+    rec.qtime = rec.qtime || {};
     api.open = true;
     let n = 0;
     const ask = () => {
       const i = todo[n];
       const q = qs[i];
-      quizEl.querySelector('.qk').textContent = `STATION QUIZ · ${stationName(stop).toUpperCase()} · QUESTION ${i + 1} OF ${qs.length}`;
+      const key = `${stop}:${i}`;
+      quizEl.querySelector('.qk').textContent = `CHECK FOR UNDERSTANDING · ${stationName(stop).toUpperCase()} · QUESTION ${i + 1} OF ${qs.length}`;
       quizEl.querySelector('.qq').textContent = q.q;
+      quizEl.querySelector('.qsum').textContent = '';
       const opts = quizEl.querySelector('.qo');
       opts.innerHTML = '';
       const fb = quizEl.querySelector('.qf');
       fb.hidden = true;
       const go = quizEl.querySelector('.qgo');
       go.hidden = true;
+      clockEl.classList.remove('stop');
+      /** Lock the answer: k is the option picked, or -1 when the time ran out. */
+      const reveal = (k) => {
+        if (rec.answers[key] !== undefined) return;
+        rec.answers[key] = k;
+        rec.qtime[key] = Math.round((CHECK_SECONDS - Math.max(0, live.left)) * 10) / 10;
+        live = null;
+        clockEl.classList.add('stop');
+        const right = k === q.answer;
+        [...opts.children].forEach((c, j) => {
+          c.disabled = true;
+          if (j === q.answer) c.classList.add('right');
+          else if (j === k) c.classList.add('wrong');
+        });
+        fb.hidden = false;
+        fb.className = `qf ${right ? 'ok' : 'no'}`;
+        fb.innerHTML = `<b>${right ? '✓ Correct.' : k < 0 ? '⏱ Time is up.' : '✗ Not quite.'}</b> `;
+        fb.appendChild(document.createTextNode(q.why));
+        audio.cue(right ? 'right' : 'wrongq');
+        const last = n >= todo.length - 1;
+        if (last) {
+          const c = checkOf(stop);
+          quizEl.querySelector('.qsum').textContent = `Check score: ${c.right} of ${c.of} correct · ${dur(c.t)}`;
+        }
+        go.hidden = false;
+        go.textContent = last ? 'CONTINUE ▶' : 'NEXT QUESTION ▶';
+        go.focus();
+        save();
+      };
       q.options.forEach((t, k) => {
         const b = el(`<button class="qopt"><em>${'ABCD'[k]}</em><span></span></button>`);
         b.querySelector('span').textContent = t;
-        b.addEventListener('click', () => {
-          if (rec.answers[`${stop}:${i}`] !== undefined) return;
-          rec.answers[`${stop}:${i}`] = k;
-          const right = k === q.answer;
-          [...opts.children].forEach((c, j) => {
-            c.disabled = true;
-            if (j === q.answer) c.classList.add('right');
-            else if (j === k) c.classList.add('wrong');
-          });
-          fb.hidden = false;
-          fb.className = `qf ${right ? 'ok' : 'no'}`;
-          fb.innerHTML = `<b>${right ? '✓ Correct.' : '✗ Not quite.'}</b> `;
-          fb.appendChild(document.createTextNode(q.why));
-          audio.cue(right ? 'right' : 'wrongq');
-          go.hidden = false;
-          go.textContent = n < todo.length - 1 ? 'NEXT QUESTION ▶' : 'CONTINUE ▶';
-          go.focus();
-          save();
-        });
+        b.addEventListener('click', () => reveal(k));
         opts.appendChild(b);
       });
+      live = {left: CHECK_SECONDS, reveal, warned: 0};
+      drawClock();
       quizEl.hidden = false;
       quizEl.classList.remove('in');
       void quizEl.offsetWidth;
@@ -289,6 +335,18 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
       done();
     };
     ask();
+  };
+  /** Run the question clock: only while the page is on screen. */
+  const tickCheck = (dt) => {
+    if (!live || document.hidden) return;
+    live.left -= dt;
+    const whole = Math.ceil(live.left);
+    if (whole <= 5 && whole > 0 && whole !== live.warned) {
+      live.warned = whole;
+      audio.cue('tick');
+    }
+    drawClock();
+    if (live.left <= 0) live.reveal(-1);
   };
 
   // ------------------------------------------------------------ the results
@@ -311,7 +369,8 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
         const a = rec.answers[`${stop}:${i}`];
         return a === undefined ? '<i class="m skip">–</i>' : a === q.answer ? '<i class="m ok">✓</i>' : '<i class="m no">✗</i>';
       }).join('');
-      return `<tr><td>${esc(stationName(stop))}</td><td>${marks}</td><td class="tnum">${rec.times && rec.times[stop] ? dur(rec.times[stop]) : '–'}</td></tr>`;
+      const c = checkOf(stop);
+      return `<tr><td>${esc(stationName(stop))}</td><td>${marks}</td><td class="tnum">${c.n ? `${c.right}/${c.of}` : '–'}</td><td class="tnum">${c.n ? dur(c.t) : '–'}</td><td class="tnum">${rec.times && rec.times[stop] ? dur(rec.times[stop]) : '–'}</td></tr>`;
     }).join('');
     resEl.innerHTML = `
       <div class="ph"><i></i>TRAINING RECORD</div>
@@ -322,10 +381,10 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
         <div class="rtime"><em>TIME</em><b>${dur(rec.elapsed)}</b><span>active time${rec.finishedAt ? ' · ' + dur((new Date(rec.finishedAt) - new Date(rec.startedAt)) / 1000) + ' start to finish' : ''}</span></div>
         <div class="rstat ${cls}"><em>STATUS</em><b>${s.status === 'Complete' ? '✓ Complete' : s.status === 'Not passed' ? 'Not passed' : 'Incomplete'}</b><span>${s.status === 'Complete' ? 'Microelectronics Lab training passed' : s.status === 'Not passed' ? `${PASS}% needed. Retake the training.` : `${QUIZ_TOTAL - s.answered} questions left`}</span></div>
       </div>
-      <div class="rbody"><table class="rtab"><tr><th>STATION</th><th>QUIZ</th><th>TIME</th></tr>${rows}</table>
+      <div class="rbody"><table class="rtab"><tr><th>STATION</th><th>CHECK</th><th>SCORE</th><th>CHECK TIME</th><th>STATION TIME</th></tr>${rows}</table>
         <div class="rside"><div class="rnote"></div>
         <div class="rbtns"></div>
-        <div class="rscale">Grades: A 90%+, B 80–89%, C 70–79%, D 60–69%, F below 60%. Completion needs every station's quiz and ${PASS}% or more.</div></div></div>`;
+        <div class="rscale">Grades: A 90%+, B 80–89%, C 70–79%, D 60–69%, F below 60%. Each check gives ${CHECK_SECONDS} seconds per question; running out of time counts as incorrect. Completion needs every station's check and ${PASS}% or more.</div></div></div>`;
     resultsSave = resEl.querySelector('.rnote');
     updateSaveLine();
     const btns = resEl.querySelector('.rbtns');
@@ -345,7 +404,8 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
       add('DOWNLOAD MY RESULTS', async () => {
         const txt = [`Microelectronics Lab Simulation · training record`, `Name: ${rec.name}`, `Student ID: ${rec.studentId}`, `Class: ${rec.period || ''}`, `Started: ${rec.startedAt}`, `Finished: ${rec.finishedAt || 'not finished'}`, `Score: ${s.correct} / ${QUIZ_TOTAL} (${s.pct}%)`, `Grade: ${s.grade}`, `Status: ${s.status}`, '', ...ORDER.flatMap((stop) => QUIZ[stop].map((q, i) => {
           const a = rec.answers[`${stop}:${i}`];
-          return `${stationName(stop)} Q${i + 1}: ${a === undefined ? 'not answered' : a === q.answer ? 'correct' : 'incorrect'}`;
+          const t = rec.qtime && rec.qtime[`${stop}:${i}`];
+          return `${stationName(stop)} Q${i + 1}: ${a === undefined ? 'not answered' : a === q.answer ? 'correct' : a < 0 ? 'time ran out' : 'incorrect'}${t !== undefined ? ` (${dur(t)})` : ''}`;
         }))].join('\n');
         try {
           await downloads.save({filename: `microlab-${rec.studentId}.txt`, data: txt});
@@ -355,6 +415,7 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
       });
     add('RETAKE TRAINING', () => {
       rec.answers = {};
+      rec.qtime = {};
       rec.elapsed = 0;
       rec.times = {};
       rec.finishedAt = null;
@@ -385,7 +446,11 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
   let rowsCache = [];
   const renderClass = (msg) => {
     const rows = rowsCache;
-    const csv = () => ['Name,Student ID,Class,Score,Percent,Grade,Status,Active time,Active minutes,Started,Finished', ...rows.map((r) => [r.name, r.studentId, r.period, `${r.correct}/${r.total}`, r.percent, r.grade, r.status, dur(r.activeSeconds), ((r.activeSeconds || 0) / 60).toFixed(1), r.startedAt, r.finishedAt || ''].map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
+    const checkCell = (r, stop) => {
+      const c = r.checks && r.checks[stop];
+      return c && c.answered ? `${c.correct}/${c.of} in ${dur(c.seconds)}` : '';
+    };
+    const csv = () => [['Name', 'Student ID', 'Class', 'Score', 'Percent', 'Grade', 'Status', 'Active time', 'Active minutes', 'Started', 'Finished', ...ORDER.map((stop) => `Check: ${stationName(stop)}`)].join(','), ...rows.map((r) => [r.name, r.studentId, r.period, `${r.correct}/${r.total}`, r.percent, r.grade, r.status, dur(r.activeSeconds), ((r.activeSeconds || 0) / 60).toFixed(1), r.startedAt, r.finishedAt || '', ...ORDER.map((stop) => checkCell(r, stop))].map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
     classEl.innerHTML = `<div class="ph"><i></i>CLASS RESULTS</div>
       <div class="cbar"><span>${rows.length} student${rows.length === 1 ? '' : 's'} · ${rows.filter((r) => r.status === 'Complete').length} complete</span><div class="bt cdl"${downloads && rows.length ? '' : ' hidden'}>DOWNLOAD CSV</div><div class="bt ccl">CLOSE</div></div>
       ${msg ? `<div class="cmsg">${esc(msg)}</div>` : ''}
@@ -435,6 +500,7 @@ export function createRecord(root, {audio, onSignedIn, onSignedOut, goto, stopIn
     save();
   };
   api.tick = (dt) => {
+    tickCheck(dt);
     if (!rec || rec.finishedAt || document.hidden || !signin.hidden) return;
     rec.elapsed = (rec.elapsed || 0) + dt;
     if (cur) rec.times[cur] = (rec.times[cur] || 0) + dt;

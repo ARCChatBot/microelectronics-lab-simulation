@@ -7,7 +7,7 @@ import {REC, oxideColour, resistThk, sheetR} from './model.js';
 
 const W = 988;
 const H = 186;
-const C = {si: '#53617A', ox: '#73C5FB', resist: '#c5553a', exposed: '#efb08f', al: '#A6AFC1', alEdge: '#5d6880', ink: '#0B0F19', label: '#53617A', blue: '#00358E', uv: '#8a5cff', heat: '#c8281e', white: '#FFFFFF'};
+const C = {si: '#53617A', ox: '#73C5FB', resist: '#00358E', exposed: '#A4B4D0', al: '#A6AFC1', alEdge: '#53617A', ink: '#0B0F19', label: '#53617A', blue: '#00358E', uv: '#FF6700', heat: '#FF6700', white: '#FFFFFF'};
 const hash = (n) => {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
@@ -108,7 +108,7 @@ export function createCloseup(root) {
     const L = s.layers;
     const f = s.f;
     // the medium around the wafer
-    const bg = {clean: '#e4f1fa', etch: '#e9f3ec', develop: '#eef2f8', strip: '#f3eef6', oxide: '#f7f1ea', bake: '#fbf1ec', expose: '#f1edfb', metal: '#111928', spin: '#FAFBFD', probe: '#FAFBFD'}[s.stepId] || '#FAFBFD';
+    const bg = {clean: '#E3EDFC', etch: '#FAFBFD', develop: '#FAFBFD', strip: '#FAFBFD', oxide: '#E3EDFC', bake: '#FAFBFD', expose: '#E3EDFC', metal: '#111928', spin: '#FAFBFD', probe: '#FAFBFD'}[s.stepId] || '#FAFBFD';
     g.fillStyle = bg;
     g.fillRect(X0, 0, XW, H);
     const ox = L.ox / 1000;
@@ -191,8 +191,8 @@ export function createCloseup(root) {
           const up = Math.max(0, k - t0) * 260;
           const y = siTop - (sc2 ? 2.5 : 4) - up;
           if (y < -8) continue;
-          if (sc2) dot(x, y, 2.6, '#7a4fc9', '#4b2d8a');
-          else dot(x, y, 2.5 + hash(i + 9) * 3, '#8a8f98', '#5d6371');
+          if (sc2) dot(x, y, 2.6, '#FF6700', '#0B0F19');
+          else dot(x, y, 2.5 + hash(i + 9) * 3, '#A6AFC1', '#53617A');
         }
         for (let i = 0; i < 14; i++) {
           const x = X0 + hash(i + 70) * XW;
@@ -210,7 +210,7 @@ export function createCloseup(root) {
           const ph = (T * 0.35 + hash(i + 20)) % 1;
           const y = 8 + ph * (siTop - 10);
           const inGlass = y > top;
-          dot(x, y, 3.2, inGlass ? '#1e5bbf' : C.blue);
+          dot(x, y, 3.2, inGlass ? '#00358E' : C.blue);
           dot(x - 3, y - 2.5, 1.4, '#ffffff');
           dot(x + 3, y - 2.5, 1.4, '#ffffff');
         }
@@ -230,8 +230,8 @@ export function createCloseup(root) {
           const ph = (T * 1.6 + hash(i)) % 1;
           const y = cols[0].top + 6 + hash(i + 5) * 20;
           dot(X0 + XW - 4 + ph * 0, y, 0, C.resist);
-          arrow(X0 + XW - 60 + ph * 40, y - ph * 12, X0 + XW - 40 + ph * 40, y - ph * 14, 'rgba(197,85,58,.7)', 1.2);
-          arrow(X0 + 60 - ph * 40, y - ph * 12, X0 + 40 - ph * 40, y - ph * 14, 'rgba(197,85,58,.7)', 1.2);
+          arrow(X0 + XW - 60 + ph * 40, y - ph * 12, X0 + XW - 40 + ph * 40, y - ph * 14, 'rgba(0,53,142,.7)', 1.2);
+          arrow(X0 + 60 - ph * 40, y - ph * 12, X0 + 40 - ph * 40, y - ph * 14, 'rgba(0,53,142,.7)', 1.2);
         }
         text(`Photoresist ${((s.layers.resist / 1000) * cut.spinK).toFixed(2)} µm`, X0 + XW / 2, cols[0].top - 10, {align: 'center', w: 700});
         break;
@@ -259,10 +259,10 @@ export function createCloseup(root) {
       case 'expose': {
         // the mask in contact: glass with chrome over the lines; UV through the openings only
         const my = cols[0].top - 12;
-        g.fillStyle = 'rgba(207,227,234,.85)';
+        g.fillStyle = 'rgba(227,237,252,.92)';
         g.fillRect(X0, my - 2, XW, 12);
         for (const c of cols) if (!c.open) {
-          g.fillStyle = '#3b3f46';
+          g.fillStyle = '#0B0F19';
           g.fillRect(c.x, my + 7, c.w, 3);
         }
         text('mask: glass with chrome stripes', X0 + XW - 6, my - 10, {align: 'right', size: 9.5, c: C.label});
@@ -274,11 +274,11 @@ export function createCloseup(root) {
           const y1 = ph * (my - 4);
           if (!on) break;
           if (c.open) arrow(x, y1 - 14, x, Math.min(c.top - 2, y1 + 14 + (my + 10 - y1) * 0), C.uv, 1.4);
-          else if (y1 < my - 6) arrow(x, y1 - 14, x, Math.min(y1, my - 4), 'rgba(138,92,255,.55)', 1.2);
+          else if (y1 < my - 6) arrow(x, y1 - 14, x, Math.min(y1, my - 4), 'rgba(255,103,0,.55)', 1.2);
         }
         if (on) {
           for (const c of cols) if (c.open) {
-            g.fillStyle = `rgba(138,92,255,${0.12 + 0.1 * Math.sin(T * 10)})`;
+            g.fillStyle = `rgba(255,103,0,${0.12 + 0.1 * Math.sin(T * 10)})`;
             g.fillRect(c.x, my + 10, c.w, c.top - my - 10 + c.rs);
           }
         }
@@ -296,7 +296,7 @@ export function createCloseup(root) {
           const ph = (T * 0.4 + hash(i + 7)) % 1;
           const y = c.top - 4 - ph * (c.top - 6);
           if ((open ? s.layers.dev : s.layers.strip) <= 0.001) break;
-          g.fillStyle = `rgba(197,85,58,${0.7 * (1 - ph)})`;
+          g.fillStyle = `rgba(0,53,142,${0.7 * (1 - ph)})`;
           g.fillRect(x, y, 4, 3);
         }
         text(open ? 'exposed photoresist dissolving' : 'photoresist dissolving in acetone', X0 + 14, 18, {c: C.label});
@@ -309,9 +309,9 @@ export function createCloseup(root) {
           const x = c.x + 4 + hash(i) * (c.w - 8);
           const ph = (T * 0.6 + hash(i + 11)) % 1;
           const y = c.top - 3 - ph * 40;
-          dot(x, y, 2, '#2c8a4f');
+          dot(x, y, 2, '#FF6700');
         }
-        text('hydrofluoric acid (green) attacks only the glass', X0 + 14, 18, {c: '#2c8a4f', w: 600});
+        text('hydrofluoric acid (orange) attacks only the glass', X0 + 14, 18, {c: '#FF6700', w: 600});
         if (cut.uc > 1) {
           const c = cols[0];
           arrow(c.x + c.w + 18, siTop - 10, c.x + c.w - cut.uc - 1, siTop - 10, C.ink, 1.2);
@@ -326,7 +326,7 @@ export function createCloseup(root) {
           const ph = (T * 0.9 + hash(i + 13)) % 1;
           const y = ph * surf(x);
           if (!s.depositing) break;
-          dot(x, y, 1.9, '#d9dee6');
+          dot(x, y, 1.9, '#E3EDFC');
         }
         text('vacuum · aluminium atoms', X0 + 14, 14, {c: '#A4B4D0', w: 600});
         text('wafer shown face up (it hangs face down in the chamber)', X0 + 14, 28, {c: '#A4B4D0', size: 9, w: 500});
@@ -340,7 +340,7 @@ export function createCloseup(root) {
         const xs = [0.2, 0.4, 0.6, 0.8].map((v) => X0 + v * XW);
         xs.forEach((x, i) => {
           const tip = top - (1 - k) * 40;
-          g.fillStyle = '#9aa3b2';
+          g.fillStyle = '#A6AFC1';
           g.beginPath();
           g.moveTo(x - 4, 0);
           g.lineTo(x + 4, 0);
@@ -404,7 +404,7 @@ export function createCloseup(root) {
       const rr = R * clamp(0.2 + s.f / 0.12);
       g.beginPath();
       g.arc(0, 0, rr, 0, Math.PI * 2);
-      g.fillStyle = 'rgba(197,85,58,.55)';
+      g.fillStyle = 'rgba(0,53,142,.55)';
       g.fill();
       for (let i = 0; i < 6; i++) {
         g.rotate(Math.PI / 3);
@@ -440,11 +440,11 @@ export function createCloseup(root) {
     for (let i = -4; i < 8; i++) {
       const open = ((i % 2) + 2) % 2 === 1;
       let col;
-      if (L.al > 0.5) col = open ? '#b9c1cf' : '#c8cfdb';
+      if (L.al > 0.5) col = open ? '#A6AFC1' : '#E0E5EC';
       else if ((open ? L.resistWindow : L.resist) > 0.5) col = open && L.doseK > 0 ? exposedRes : C.resist;
       else {
         const t = open ? L.ox - L.etch : L.ox;
-        col = t > 5 ? rgb(oxideColour(t)) : '#8f969d';
+        col = t > 5 ? rgb(oxideColour(t)) : '#53617A';
       }
       g.fillStyle = col;
       g.fillRect(mx - mr + i * stripe, my - mr, stripe, mr * 2);
@@ -460,7 +460,7 @@ export function createCloseup(root) {
       }
     }
     // the probe needle tips
-    if (s.stepId === 'probe' && s.probing > 0.5) for (let i = 0; i < 4; i++) dot(mx - 39 + i * 26, my, 4, '#3b3f46');
+    if (s.stepId === 'probe' && s.probing > 0.5) for (let i = 0; i < 4; i++) dot(mx - 39 + i * 26, my, 4, '#0B0F19');
     g.restore();
     g.strokeStyle = '#0B0F19';
     g.lineWidth = 3;

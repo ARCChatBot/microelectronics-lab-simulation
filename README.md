@@ -10,8 +10,9 @@ A first-person 3D training simulation of a teaching cleanroom, written for high 
 - **Hands-on stations:** each step starts only when the student clicks the glowing control on the machine.
 - **Microscope close-up** of what is physically happening to the wafer at each step, with layer thicknesses from the model.
 - **Sound:** filter-fan room tone, machine loops, footsteps and action cues, all generated in the browser.
-- **Station quizzes:** 22 questions with feedback, graded A–F; 70% completes the training.
-- **Timing:** active time overall and at each station.
+- **Timed checks for understanding:** 22 questions across the stations, 60 seconds each, scored and timed; graded A–F, and 70% completes the training.
+- **Timing:** active time overall, at each station, and on every check question.
+- **MI-CHIPS palette** throughout the console, the close-up and the lab.
 - **Three views:** the operator's eyes, walking (W A S D), and a floor plan.
 
 ## One model behind every number

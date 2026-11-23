@@ -79,7 +79,7 @@ body>.turn{position:fixed;left:0;right:0;bottom:18px;text-align:center;font:600 
 .cb .bt{margin:0;height:32px;padding:0 14px}
 .cb .bt[hidden]{display:none}
 .cb .cgo{background:var(--c03);border-color:var(--c03);color:var(--c02)}
-.cb .cgo:hover{background:#002a72}
+.cb .cgo:hover{background:#111928}
 .card .turn{display:flex;align-items:center;gap:10px;margin-top:12px;padding:9px 12px;border-radius:4px;background:var(--c01);color:var(--c02);font:500 13px Inter,sans-serif}
 .card .turn[hidden]{display:none}
 .card .turn b{font:800 10px Inter,sans-serif;letter-spacing:1.8px;color:var(--c04)}
@@ -149,10 +149,10 @@ body>.turn{position:fixed;left:0;right:0;bottom:18px;text-align:center;font:600 
 .sbox input{width:100%;height:38px;padding:0 12px;border:1px solid var(--c09);border-radius:4px;font:500 14px Inter,sans-serif;color:var(--c01);background:var(--c08)}
 .sbox input:focus{outline:2px solid var(--c03);outline-offset:0;background:var(--c02)}
 .srow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.serr{margin-top:10px;font-size:12.5px;color:#c8281e;font-weight:600}
+.serr{margin-top:10px;font-size:12.5px;color:#FF6700;font-weight:600}
 .serr[hidden]{display:none}
 .sgo{margin:18px 0 0;height:42px;justify-content:center;width:100%;background:var(--c03);border-color:var(--c03);color:var(--c02);font-size:12px;font-family:Inter,sans-serif}
-.sgo:hover{background:#002a72}
+.sgo:hover{background:#111928}
 .snote{margin-top:10px;font-size:11.5px;line-height:1.4;color:var(--c07)}
 .stu{position:absolute;z-index:2;left:410px;top:14px;display:flex;align-items:center;gap:10px;height:30px;padding:0 6px 0 12px;border:1px solid var(--c09);border-radius:4px;background:var(--c02);pointer-events:auto}
 .stu[hidden]{display:none}
@@ -172,16 +172,16 @@ body>.turn{position:fixed;left:0;right:0;bottom:18px;text-align:center;font:600 
 .qopt:hover:not(:disabled){border-color:var(--c03);background:var(--c08)}
 .qopt:focus-visible{outline:2px solid var(--c03);outline-offset:2px}
 .qopt:disabled{cursor:default}
-.qopt.right{border-color:#2c8a4f;background:#eaf6ef}
-.qopt.right em{background:#2c8a4f;color:#fff}
-.qopt.wrong{border-color:#c8281e;background:#fbeceb}
-.qopt.wrong em{background:#c8281e;color:#fff}
+.qopt.right{border-color:#00358E;background:#E3EDFC}
+.qopt.right em{background:#00358E;color:#fff}
+.qopt.wrong{border-color:#FF6700;background:#FAFBFD}
+.qopt.wrong em{background:#FF6700;color:#fff}
 .qf{margin-top:12px;padding:9px 12px;border-radius:4px;font-size:13px;line-height:1.45;color:var(--c01)}
 .qf[hidden]{display:none}
-.qf.ok{background:#eaf6ef}
-.qf.ok b{color:#1f6e3e}
-.qf.no{background:#fbeceb}
-.qf.no b{color:#a3201a}
+.qf.ok{background:#E3EDFC}
+.qf.ok b{color:#00358E}
+.qf.no{background:#FAFBFD}
+.qf.no b{color:#FF6700}
 .qb{display:flex;justify-content:flex-end;margin-top:10px}
 .qb .bt{margin:0;height:34px;padding:0 16px;background:var(--c03);border-color:var(--c03);color:var(--c02)}
 .qb .bt[hidden]{display:none}
@@ -200,18 +200,18 @@ body>.turn{position:fixed;left:0;right:0;bottom:18px;text-align:center;font:600 
 .rscore span{font-size:13px;color:var(--c07)}
 .rstat b{display:block;font-size:20px;font-weight:800;margin-top:6px}
 .rstat span{display:block;font-size:12px;color:var(--c07);margin-top:3px}
-.rstat.ok{background:#eaf6ef;border-color:#bfe3cc}
-.rstat.ok b{color:#1f6e3e}
-.rstat.no{background:#fbeceb;border-color:#f0c7c4}
-.rstat.no b{color:#a3201a}
+.rstat.ok{background:#E3EDFC;border-color:#A4B4D0}
+.rstat.ok b{color:#00358E}
+.rstat.no{background:#FAFBFD;border-color:#E0E5EC}
+.rstat.no b{color:#FF6700}
 .rstat.mid b{color:var(--c04)}
 .rbody{display:grid;grid-template-columns:1.2fr 1fr;gap:24px}
 .rtab,.ctab{width:100%;border-collapse:collapse;font-size:12.5px}
 .rtab th,.ctab th{text-align:left;font:700 9.5px Inter,sans-serif;letter-spacing:1.4px;color:var(--c07);padding:4px 0}
 .rtab td,.ctab td{padding:6px 8px 6px 0;border-top:1px solid var(--c09)}
 .m{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-right:4px;border-radius:50%;font-style:normal;font-weight:800;font-size:11px}
-.m.ok{background:#eaf6ef;color:#1f6e3e}
-.m.no{background:#fbeceb;color:#a3201a}
+.m.ok{background:#E3EDFC;color:#00358E}
+.m.no{background:#FAFBFD;color:#FF6700}
 .m.skip{background:var(--c09);color:var(--c07)}
 .rnote{padding:10px 12px;border-radius:4px;background:var(--c12);font-size:12.5px;line-height:1.45;color:var(--c03)}
 .rbtns{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
@@ -225,8 +225,8 @@ body>.turn{position:fixed;left:0;right:0;bottom:18px;text-align:center;font:600 
 .cmsg{margin-bottom:10px;font-size:12.5px;color:var(--c07)}
 .cempty{padding:20px 0;font-size:13px;color:var(--c07)}
 .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
-.pill.ok{background:#eaf6ef;color:#1f6e3e}
-.pill.no{background:#fbeceb;color:#a3201a}
+.pill.ok{background:#E3EDFC;color:#00358E}
+.pill.no{background:#FAFBFD;color:#FF6700}
 .pill.mid{background:var(--c12);color:var(--c03)}
 @media (prefers-reduced-motion:reduce){.quiz.in,.results.in{animation:none}}
 
@@ -234,3 +234,17 @@ body>.turn{position:fixed;left:0;right:0;bottom:18px;text-align:center;font:600 
 .rtime span{display:block;font-size:11.5px;color:var(--c07);margin-top:2px}
 .tnum{font-variant-numeric:tabular-nums;color:var(--c07)}
 .stu .tm{font-style:normal;font-size:12px;font-weight:700;color:var(--c03);font-variant-numeric:tabular-nums;min-width:52px}
+
+/* the check-for-understanding clock */
+.qhead{display:flex;align-items:center;gap:16px}
+.qhead .qk{flex:1}
+.qclock{display:flex;align-items:center;gap:10px}
+.qclock b{font-size:15px;font-weight:800;color:var(--c03);font-variant-numeric:tabular-nums;min-width:62px;text-align:right}
+.qclock i{display:block;width:140px;height:6px;border-radius:3px;background:var(--c09);overflow:hidden}
+.qclock s{display:block;height:100%;background:var(--c03);text-decoration:none;transition:width .2s linear}
+.qclock.low b{color:var(--c04)}
+.qclock.low s{background:var(--c04)}
+.qclock.stop{opacity:.55}
+.qb{align-items:center;gap:12px}
+.qsum{margin-right:auto;font-size:13px;font-weight:700;color:var(--c03)}
+.rtab td,.rtab th{white-space:nowrap}

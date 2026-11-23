@@ -5,7 +5,7 @@ import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {DOORWAYS, FFU, REC, ROOM, STATIONS, WAFER, WALLS, ZONES, ffuLayout, lerp, sheetR, toWorld} from './model.js';
 
-export const COL = {bg: '#FAFBFD', ground: '#E0E5EC', ink: '#0B0F19', accent: '#FF6700', uv: '#8a5cff', hot: '#ff6a1f'};
+export const COL = {bg: '#FAFBFD', ground: '#E0E5EC', ink: '#0B0F19', accent: '#FF6700', uv: '#FF6700', hot: '#FF6700'};
 
 export function createLab(canvas) {
   const renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreference: 'high-performance'});
@@ -22,7 +22,7 @@ export function createLab(canvas) {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.55;
 
-  const hemi = new THREE.HemisphereLight('#ffffff', '#cfd6e2', 0.75);
+  const hemi = new THREE.HemisphereLight('#ffffff', '#E0E5EC', 0.75);
   scene.add(hemi);
   const sun = new THREE.DirectionalLight('#ffffff', 1.7);
   sun.position.set(4, 18, 9);
@@ -42,28 +42,28 @@ export function createLab(canvas) {
   const edgeMat = new THREE.LineBasicMaterial({color: COL.ink, transparent: true, opacity: 0.32});
   const mat = (color, o = {}) => new THREE.MeshStandardMaterial({color, roughness: 0.7, metalness: 0, ...o});
   const MAT = {
-    pp: mat('#f2f1ec', {roughness: 0.5}), // white polypropylene, the wet-bench plastic
-    paint: mat('#d5d9dc', {roughness: 0.55}), // equipment grey powder coat
-    beige: mat('#ddd6c6', {roughness: 0.55}),
+    pp: mat('#FAFBFD', {roughness: 0.5}), // white polypropylene, the wet-bench plastic
+    paint: mat('#E0E5EC', {roughness: 0.55}), // equipment grey powder coat
+    beige: mat('#E0E5EC', {roughness: 0.55}),
     blue: mat('#00358E', {roughness: 0.5}),
-    steel: mat('#c3c8cd', {roughness: 0.32, metalness: 0.9}),
-    black: mat('#1f2226', {roughness: 0.5}),
-    rubber: mat('#2e3136', {roughness: 0.9}),
-    granite: mat('#3a3c40', {roughness: 0.25, metalness: 0.1}),
+    steel: mat('#A6AFC1', {roughness: 0.32, metalness: 0.9}),
+    black: mat('#111928', {roughness: 0.5}),
+    rubber: mat('#0B0F19', {roughness: 0.9}),
+    granite: mat('#111928', {roughness: 0.25, metalness: 0.1}),
     accent: mat(COL.accent, {roughness: 0.6}),
-    red: mat('#c8281e', {roughness: 0.45}),
-    yellow: mat('#f0c419', {roughness: 0.5}),
-    green: mat('#2c8a4f', {roughness: 0.5}),
-    copper: mat('#b87333', {roughness: 0.35, metalness: 0.9}),
-    glass: mat('#cfe3ea', {transparent: true, opacity: 0.2, roughness: 0.05, depthWrite: false}),
-    liquid: mat('#8cc3df', {transparent: true, opacity: 0.55, roughness: 0.1, depthWrite: false}),
-    quartz: mat('#eef5f7', {transparent: true, opacity: 0.3, roughness: 0.05, depthWrite: false, side: THREE.DoubleSide}),
-    ptfe: mat('#fbfbf7', {transparent: true, opacity: 0.8, roughness: 0.4, depthWrite: false}),
-    ldpe: mat('#f4f4ee', {transparent: true, opacity: 0.75, roughness: 0.4}),
-    wood: mat('#d9c7a6'),
-    amber: mat('#8a4f12', {roughness: 0.3, transparent: true, opacity: 0.85}),
-    fabric: mat('#fbfbf8', {roughness: 0.95}),
-    chair: mat('#3b4250', {roughness: 0.9}),
+    red: mat('#FF6700', {roughness: 0.45}),
+    yellow: mat('#FF6700', {roughness: 0.5}),
+    green: mat('#00358E', {roughness: 0.5}),
+    copper: mat('#FF6700', {roughness: 0.35, metalness: 0.9}),
+    glass: mat('#E3EDFC', {transparent: true, opacity: 0.2, roughness: 0.05, depthWrite: false}),
+    liquid: mat('#73C5FB', {transparent: true, opacity: 0.55, roughness: 0.1, depthWrite: false}),
+    quartz: mat('#E3EDFC', {transparent: true, opacity: 0.3, roughness: 0.05, depthWrite: false, side: THREE.DoubleSide}),
+    ptfe: mat('#FAFBFD', {transparent: true, opacity: 0.8, roughness: 0.4, depthWrite: false}),
+    ldpe: mat('#FAFBFD', {transparent: true, opacity: 0.75, roughness: 0.4}),
+    wood: mat('#A4B4D0'),
+    amber: mat('#53617A', {roughness: 0.3, transparent: true, opacity: 0.85}),
+    fabric: mat('#FFFFFF', {roughness: 0.95}),
+    chair: mat('#53617A', {roughness: 0.9}),
   };
   const finish = (m, edges) => {
     m.castShadow = true;
@@ -93,7 +93,7 @@ export function createLab(canvas) {
   };
   /** A flat sign or screen facing local +z, centred on (x, y, z). glow makes it a lit display. */
   const sign = (parent, text, w, h, x, y, z, o = {}) => {
-    const {bg = '#ffffff', fg = '#16181b', ry = 0, rx = 0, size = 0.6, glow = false, draw} = o;
+    const {bg = '#ffffff', fg = '#0B0F19', ry = 0, rx = 0, size = 0.6, glow = false, draw} = o;
     const cv = document.createElement('canvas');
     cv.width = 256;
     cv.height = Math.max(16, Math.round((256 * h) / w));
@@ -116,8 +116,8 @@ export function createLab(canvas) {
     parent.add(m);
     return m;
   };
-  const LCD = {bg: '#0c1512', fg: '#5cf2a0', glow: true};
-  const LED = {bg: '#1a0b08', fg: '#ff5a3c', glow: true};
+  const LCD = {bg: '#111928', fg: '#73C5FB', glow: true};
+  const LED = {bg: '#0B0F19', fg: '#FF6700', glow: true};
   /** A bench: a top slab on four legs. */
   const table = (g, w, h, d, top, leg, thick = 0.06) => {
     box(g, w, thick, d, 0, h - thick, 0, top, true, 0.012);
@@ -126,7 +126,7 @@ export function createLab(canvas) {
   };
   /** An emergency-off mushroom button on its yellow plate, facing +z. */
   const emo = (g, x, y, z) => {
-    cyl(g, 0.034, 0.008, x, y, z, MAT.yellow, false, false, 'z');
+    cyl(g, 0.034, 0.008, x, y, z, MAT.black, false, false, 'z');
     cyl(g, 0.022, 0.03, x, y, z + 0.015, MAT.red, false, false, 'z');
   };
   /** A wash bottle with a coloured cap. */
@@ -142,7 +142,7 @@ export function createLab(canvas) {
     cv.width = ROOM.W * S;
     cv.height = ROOM.D * S;
     const g = cv.getContext('2d');
-    const tint = {design: '#d3dbe8', gown: '#E3EDFC', main: '#F1F4F8', litho: '#efe3a6', test: '#F1F4F8'};
+    const tint = {design: '#E0E5EC', gown: '#E3EDFC', main: '#FAFBFD', litho: '#efe3a6', test: '#FAFBFD'};
     for (const z of ZONES) {
       g.fillStyle = tint[z.id];
       g.fillRect(z.x0 * S, z.z0 * S, (z.x1 - z.x0) * S, (z.z1 - z.z0) * S);
@@ -181,7 +181,7 @@ export function createLab(canvas) {
   scene.add(lintels);
   {
     const t = ROOM.wall;
-    const wallMat = mat('#F7F9FC', {roughness: 0.6});
+    const wallMat = mat('#FAFBFD', {roughness: 0.6});
     const capMat = mat(COL.ink);
     for (const [x0, z0, x1, z1] of WALLS) {
       const w = Math.abs(x1 - x0) + t;
@@ -212,7 +212,7 @@ export function createLab(canvas) {
     // door signs
     sign(lintels, 'GOWNING · ISO 7', 0.8, 0.14, 1.5, 2.3, 3.94, {ry: Math.PI});
     sign(lintels, 'PROCESS BAY · ISO 6', 0.9, 0.14, 2.94, 2.3, 6.1, {ry: -Math.PI / 2});
-    sign(lintels, 'LITHOGRAPHY · ISO 5\nYELLOW LIGHT ONLY', 0.9, 0.28, 9.44, 2.38, 2.5, {ry: -Math.PI / 2, bg: '#f0c419'});
+    sign(lintels, 'LITHOGRAPHY · ISO 5\nYELLOW LIGHT ONLY', 0.9, 0.28, 9.44, 2.38, 2.5, {ry: -Math.PI / 2, bg: '#FF6700'});
     sign(lintels, 'TEST BAY · ISO 6', 0.76, 0.14, 9.44, 2.3, 6.3, {ry: -Math.PI / 2});
   }
   // room safety: shower and eyewash, extinguisher, nitrogen cylinders
@@ -223,14 +223,14 @@ export function createLab(canvas) {
     cyl(g, 0.02, 0.5, 3.45, 2.2, 3.6, MAT.yellow, false, false, 'x');
     cyl(g, 0.11, 0.03, 3.68, 2.15, 3.6, MAT.yellow, false);
     cyl(g, 0.13, 0.05, 3.3, 1.0, 3.25, MAT.yellow, false);
-    sign(g, 'SAFETY SHOWER\nEYEWASH', 0.4, 0.2, 3.06, 1.7, 3.4, {ry: Math.PI / 2, bg: '#2c8a4f', fg: '#ffffff'});
+    sign(g, 'SAFETY SHOWER\nEYEWASH', 0.4, 0.2, 3.06, 1.7, 3.4, {ry: Math.PI / 2, bg: '#00358E', fg: '#ffffff'});
     cyl(g, 0.07, 0.5, 3.2, 0.3, 4.6, MAT.red, false);
     for (const z of [7.45, 7.7]) {
       cyl(g, 0.115, 1.45, 9.25, 0, z, MAT.paint, false);
       cyl(g, 0.03, 0.12, 9.25, 1.45, z, MAT.steel, false);
     }
     box(g, 0.06, 0.04, 0.6, 9.36, 1.0, 7.575, MAT.black, false);
-    sign(g, 'N2', 0.16, 0.12, 9.13, 0.9, 7.45, {ry: -Math.PI / 2, bg: '#1f2226', fg: '#ffffff'});
+    sign(g, 'N2', 0.16, 0.12, 9.13, 0.9, 7.45, {ry: -Math.PI / 2, bg: '#111928', fg: '#ffffff'});
   }
 
   // ------------------------------------------------------------ ceiling: tiles and fan filter units from the model
@@ -239,12 +239,12 @@ export function createLab(canvas) {
   const ffus = [];
   const tiles = [];
   {
-    const face = mat('#dfe9ee', {roughness: 0.5});
+    const face = mat('#E3EDFC', {roughness: 0.5});
     const light = new THREE.MeshBasicMaterial({color: '#ffffff'});
     const lightAmber = new THREE.MeshBasicMaterial({color: '#ffcf33'});
     for (const z of ZONES) {
       const lit = z.id === 'litho';
-      const tile = mat(lit ? '#f3e7b0' : '#f4f3ee', {transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false});
+      const tile = mat(lit ? '#f3e7b0' : '#FAFBFD', {transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false});
       tiles.push(tile);
       const W = z.x1 - z.x0;
       const D = z.z1 - z.z0;
@@ -271,7 +271,7 @@ export function createLab(canvas) {
   }
   // down-flow streaks: 6 under each unit, falling at the real face velocity
   const STREAKS = 6;
-  const air = new THREE.InstancedMesh(new THREE.BoxGeometry(0.012, 0.22, 0.012), new THREE.MeshBasicMaterial({color: '#5aa7d6', transparent: true, opacity: 0.7}), ffus.length * STREAKS);
+  const air = new THREE.InstancedMesh(new THREE.BoxGeometry(0.012, 0.22, 0.012), new THREE.MeshBasicMaterial({color: '#73C5FB', transparent: true, opacity: 0.7}), ffus.length * STREAKS);
   air.frustumCulled = false;
   scene.add(air);
   const dummy = new THREE.Object3D();
@@ -299,7 +299,7 @@ export function createLab(canvas) {
     box(shell, 0.03, 1.95 - deck, d, w / 2 - 0.015, deck, 0, sm.glass, false);
     box(shell, w, 0.45, 0.012, 0, 1.5, d / 2 - 0.02, sm.glass, false);
     box(shell, w, 0.03, 0.03, 0, 1.49, d / 2 - 0.02, sm.steel, false);
-    const lamp = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.8, 0.1), new THREE.MeshBasicMaterial({color: '#fffbe8'}));
+    const lamp = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.8, 0.1), new THREE.MeshBasicMaterial({color: '#FFFFFF'}));
     lamp.rotation.x = Math.PI / 2;
     lamp.position.set(0, 1.945, 0.05);
     shell.add(lamp);
@@ -324,7 +324,7 @@ export function createLab(canvas) {
     box(g, 0.3, 0.25, 0.3, x, deck, 0, tankMat, true).castShadow = false;
     box(g, 0.27, 0.19, 0.27, x, deck + 0.01, 0, MAT.liquid, false).castShadow = false;
     box(g, 0.34, 0.012, 0.34, x, deck, 0, MAT.steel, false);
-    sign(g, label, 0.26, 0.07, x, deck + 0.42, -d / 2 + 0.064, {bg: '#16181b', fg: '#ffffff'});
+    sign(g, label, 0.26, 0.07, x, deck + 0.42, -d / 2 + 0.064, {bg: '#0B0F19', fg: '#ffffff'});
     if (temp) sign(g, temp, 0.12, 0.05, x, deck - 0.075, d / 2 + 0.029, LED);
   };
   const faucet = (g, x, deck, z) => {
@@ -343,10 +343,10 @@ export function createLab(canvas) {
     box(g, 0.04, 0.14, 0.03, 0, 0.75, -0.2, MAT.black, false);
     box(g, 0.66, 0.4, 0.025, 0, 0.87, -0.2, MAT.black, true, 0.008);
     // the screen shows the mask: lines and spaces at the model's pitch
-    sign(g, '', 0.62, 0.36, 0, 1.07, -0.186, {bg: '#10151b', glow: true, draw: (c, w, h) => {
+    sign(g, '', 0.62, 0.36, 0, 1.07, -0.186, {bg: '#111928', glow: true, draw: (c, w, h) => {
       c.fillStyle = COL.accent;
       for (let i = 0; i < 9; i++) c.fillRect(24 + i * 24, h * 0.14, 12, h * 0.62);
-      c.fillStyle = '#8fa3b8';
+      c.fillStyle = '#A4B4D0';
       c.font = '600 11px monospace';
       c.textAlign = 'left';
       c.fillText(`MASK 1 · ${REC.mask.line} um LINE / ${REC.mask.space} um SPACE`, 24, h * 0.9);
@@ -400,8 +400,8 @@ export function createLab(canvas) {
     emo(sh, -0.5, 1.3, 0.405);
     box(sh, 0.6, 0.14, 0.8, -1.0, 1.95, 0, sm.pp, true, 0.012);
     // three quartz tubes, 180 mm outside diameter, along the tool's x. The middle one is ours.
-    parts.coilMat = mat('#6b4a3a', {emissive: COL.hot, emissiveIntensity: 0, roughness: 0.6});
-    const idle = mat('#6b4a3a', {emissive: COL.hot, emissiveIntensity: 0.15, roughness: 0.6});
+    parts.coilMat = mat('#53617A', {emissive: COL.hot, emissiveIntensity: 0, roughness: 0.6});
+    const idle = mat('#53617A', {emissive: COL.hot, emissiveIntensity: 0.15, roughness: 0.6});
     for (const [i, y] of [0.95, 1.2, 1.45].entries()) {
       const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.8, 36, 1, true), MAT.quartz);
       tube.rotation.z = Math.PI / 2;
@@ -454,7 +454,7 @@ export function createLab(canvas) {
   station('bake', (g, sh, sm) => {
     wetBody(g, 1.0, 0.75, 0.85);
     box(g, 0.28, 0.07, 0.36, 0, 0.85, 0.02, MAT.paint, true, 0.012);
-    parts.plateMat = mat('#e9e6df', {emissive: COL.hot, emissiveIntensity: 0, roughness: 0.4});
+    parts.plateMat = mat('#E0E5EC', {emissive: COL.hot, emissiveIntensity: 0, roughness: 0.4});
     box(g, 0.22, 0.012, 0.22, 0, 0.92, -0.02, parts.plateMat, false);
     sign(g, `${REC.resist.bakeT}°C`, 0.09, 0.035, -0.05, 0.895, 0.201, LED);
     cyl(g, 0.014, 0.02, 0.07, 0.895, 0.205, MAT.black, false, false, 'z');
@@ -487,13 +487,13 @@ export function createLab(canvas) {
     // the mask in its holder: drops into contact for the exposure
     parts.mask = new THREE.Group();
     box(parts.mask, 0.2, 0.012, 0.2, 0, 0, 0, MAT.black);
-    box(parts.mask, 0.15, 0.004, 0.15, 0, 0.012, 0, mat('#5a3d2a', {transparent: true, opacity: 0.7, roughness: 0.1}), false);
+    box(parts.mask, 0.15, 0.004, 0.15, 0, 0.012, 0, mat('#111928', {transparent: true, opacity: 0.7, roughness: 0.1}), false);
     g.add(parts.mask);
     // the exposure head over the stage: the shell. The lamp house with its cooling fins sits behind.
     box(sh, 0.5, 0.36, 0.55, 0, 1.4, -0.12, sm.paint, true, 0.015);
     box(g, 0.24, 0.5, 0.22, 0.38, 0.75, -0.36, MAT.black, true, 0.01);
     for (let i = 0; i < 7; i++) box(g, 0.26, 0.008, 0.24, 0.38, 0.82 + i * 0.06, -0.36, MAT.black, false);
-    sign(g, 'UV', 0.1, 0.07, 0.38, 1.05, -0.248, {bg: '#f0c419'});
+    sign(g, 'UV', 0.1, 0.07, 0.38, 1.05, -0.248, {bg: '#FF6700'});
     parts.uv = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.38, 32, 1, true), new THREE.MeshBasicMaterial({color: COL.uv, transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthWrite: false}));
     parts.uv.position.set(0, 1.21, 0);
     g.add(parts.uv);
@@ -505,8 +505,8 @@ export function createLab(canvas) {
       cyl(g, 0.085, 0.04, x, 0.85, 0, MAT.quartz, false).castShadow = false;
       cyl(g, 0.078, 0.025, x, 0.855, 0, MAT.liquid, false).castShadow = false;
     }
-    sign(g, 'MF-319 DEVELOPER', 0.3, 0.06, -0.3, 1.27, -0.336, {bg: '#16181b', fg: '#ffffff'});
-    sign(g, 'ACETONE STRIP', 0.3, 0.06, 0.3, 1.27, -0.336, {bg: '#c8281e', fg: '#ffffff'});
+    sign(g, 'MF-319 DEVELOPER', 0.3, 0.06, -0.3, 1.27, -0.336, {bg: '#0B0F19', fg: '#ffffff'});
+    sign(g, 'ACETONE STRIP', 0.3, 0.06, 0.3, 1.27, -0.336, {bg: '#FF6700', fg: '#ffffff'});
     bottle(g, -0.62, 0.85, -0.2, MAT.red);
     bottle(g, -0.54, 0.85, -0.24, MAT.blue);
     bottle(g, 0.6, 0.85, -0.22, MAT.pp);
@@ -520,7 +520,7 @@ export function createLab(canvas) {
     wetBody(g, 1.8, 0.9, 0.75);
     bath(g, 0, 0.75, 0.9, 'BOE 6:1', MAT.ptfe, null);
     bath(g, 0.55, 0.75, 0.9, 'DI RINSE', MAT.ptfe, null);
-    sign(g, 'DANGER\nHYDROFLUORIC ACID', 0.5, 0.2, -0.55, 1.5, -0.386, {bg: '#f0c419', fg: '#16181b'});
+    sign(g, 'DANGER\nHYDROFLUORIC ACID', 0.5, 0.2, -0.55, 1.5, -0.386, {bg: '#FF6700', fg: '#0B0F19'});
     bottle(g, -0.62, 0.75, -0.2, MAT.pp);
     box(g, 0.14, 0.05, 0.1, -0.5, 0.75, 0.2, MAT.blue, false, 0.01); // calcium gluconate kit
     faucet(g, 0.3, 0.75, -0.28);
@@ -544,13 +544,13 @@ export function createLab(canvas) {
     arm.rotation.y = -Math.PI / 4;
     // source: a boat between two copper posts
     for (const s of [-1, 1]) cyl(g, 0.012, 0.06, s * 0.05, 0.93, 0, MAT.copper, false);
-    parts.crucibleMat = mat('#5a5148', {emissive: COL.hot, emissiveIntensity: 0});
+    parts.crucibleMat = mat('#53617A', {emissive: COL.hot, emissiveIntensity: 0});
     box(g, 0.1, 0.012, 0.03, 0, 0.972, 0, parts.crucibleMat, false);
     // the wafer holder and the crystal monitor beside it
     cyl(g, 0.085, 0.012, 0, 1.43, 0, MAT.steel, false);
     cyl(g, 0.008, 0.2, 0, 1.44, 0, MAT.steel, false);
     cyl(g, 0.02, 0.03, 0.14, 1.36, 0, MAT.copper, false);
-    parts.vapour = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.44, 32, 1, true), new THREE.MeshBasicMaterial({color: '#9fb4c8', transparent: true, opacity: 0.4, side: THREE.DoubleSide, depthWrite: false}));
+    parts.vapour = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.44, 32, 1, true), new THREE.MeshBasicMaterial({color: '#A4B4D0', transparent: true, opacity: 0.4, side: THREE.DoubleSide, depthWrite: false}));
     parts.vapour.rotation.x = Math.PI;
     parts.vapour.position.set(0, 1.2, 0);
     g.add(parts.vapour);
@@ -571,7 +571,7 @@ export function createLab(canvas) {
     // the microscope head: the shell
     box(sh, 0.16, 0.14, 0.2, 0, 1.3, 0.02, sm.pp, true, 0.02);
     cyl(sh, 0.03, 0.1, 0, 1.2, 0.02, sm.steel, false);
-    const ringLight = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.008, 8, 24), new THREE.MeshBasicMaterial({color: '#fffbe8'}));
+    const ringLight = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.008, 8, 24), new THREE.MeshBasicMaterial({color: '#FFFFFF'}));
     ringLight.rotation.x = Math.PI / 2;
     ringLight.position.set(0, 1.195, 0.02);
     sh.add(ringLight);
@@ -602,12 +602,12 @@ export function createLab(canvas) {
     box(g, 0.4, 0.2, 0.36, 0.48, 0.75, -0.12, MAT.beige, true, 0.012);
     sign(g, `Rs ${sheetR(REC.al.target).toFixed(4)} Ω/sq\nI ${REC.probe.I * 1000} mA`, 0.24, 0.13, 0.42, 0.855, 0.062, LCD);
     for (let i = 0; i < 2; i++) cyl(g, 0.02, 0.02, 0.61, 0.82 + i * 0.07, 0.066, MAT.black, false, false, 'z');
-    sign(g, '4-POINT PROBE', 0.3, 0.05, -0.45, 0.752, 0.2, {rx: -Math.PI / 2, bg: '#16181b', fg: '#ffffff'});
+    sign(g, '4-POINT PROBE', 0.3, 0.05, -0.45, 0.752, 0.2, {rx: -Math.PI / 2, bg: '#0B0F19', fg: '#ffffff'});
   });
 
   // ------------------------------------------------------------ the wafer, its tweezers, its marker and the operator
   const wafer = new THREE.Group();
-  const waferMat = mat('#8f969d', {roughness: 0.18, metalness: 0.7});
+  const waferMat = mat('#A6AFC1', {roughness: 0.18, metalness: 0.7});
   {
     const r = WAFER.d / 2;
     const a = Math.asin(WAFER.flat / 2 / r);
@@ -663,7 +663,7 @@ export function createLab(canvas) {
 
   // ------------------------------------------------------------ action effects: bubbles in a bath, a drop of resist
   const BUBBLES = 36;
-  const bubbles = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 8, 6), new THREE.MeshStandardMaterial({color: '#ffffff', transparent: true, opacity: 0.85, roughness: 0.05, emissive: '#cfe8ff', emissiveIntensity: 0.25}), BUBBLES);
+  const bubbles = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 8, 6), new THREE.MeshStandardMaterial({color: '#ffffff', transparent: true, opacity: 0.85, roughness: 0.05, emissive: '#E3EDFC', emissiveIntensity: 0.25}), BUBBLES);
   bubbles.frustumCulled = false;
   bubbles.visible = false;
   scene.add(bubbles);

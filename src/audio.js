@@ -197,6 +197,8 @@ export function createAudio() {
     done: () => [523, 659, 784].forEach((f, i) => tone(f, 0.45, 0.08, 'triangle', i * 0.09)),
     // the whole run finished
     finish: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.8, 0.09, 'triangle', i * 0.12)),
+    // the last seconds of a check question
+    tick: () => tone(1500, 0.04, 0.05, 'square'),
     // a quiz answer: right rises, wrong falls
     right: () => {
       tone(784, 0.18, 0.09, 'triangle');

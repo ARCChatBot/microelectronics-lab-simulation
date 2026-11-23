@@ -53,6 +53,7 @@ export function zoneAir(z) {
 
 // ------------------------------------------------------------ the recipe
 export const PASS = 70; // percent on the station quizzes needed to complete the training
+export const CHECK_SECONDS = 60; // time allowed for each check-for-understanding question
 export const REC = {
   clean: {sc1: 10, sc2: 10, T: 75},
   ox: {T: 1100, A: 0.11, B: 0.51, target: 0.5},
@@ -233,11 +234,8 @@ export function layersAt(tau) {
 }
 
 // thermal oxide interference colours, nm -> colour (the standard chart, approximate on a screen)
-const OX_COLOURS = [
-  [0, '#8f969d'], [50, '#b59a6e'], [75, '#8a5a3a'], [100, '#5b2a78'], [125, '#2a3fa8'], [150, '#5f9bd6'], [175, '#b9cf8a'], [200, '#d9c05a'],
-  [225, '#d9a23c'], [250, '#e08a4a'], [275, '#b0407a'], [300, '#4a4ac0'], [325, '#2f8fb0'], [350, '#7fc06a'], [375, '#c0d050'], [390, '#e0d040'],
-  [412, '#e8a850'], [426, '#e88aa0'], [443, '#c04a78'], [465, '#a03a8a'], [480, '#5a40b8'], [493, '#3a6ac8'], [502, '#2f9aa8'], [520, '#4ab070'],
-];
+// the wafer in the MI-CHIPS palette: Body Silver silicon turning Technology Ice Blue as the glass grows
+const OX_COLOURS = [[0, '#A6AFC1'], [500, '#73C5FB'], [520, '#73C5FB']];
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
 const mix = (a, b, k) => a.map((v, i) => lerp(v, b[i], k));
 export function oxideColour(nm) {
@@ -250,11 +248,11 @@ export function oxideColour(nm) {
 }
 /** What the wafer face looks like from across the room, rgb 0..1. The 10 um pattern is far too small to see. */
 export function waferColour(L) {
-  const si = hex('#8f969d');
+  const si = hex('#A6AFC1');
   let c = oxideColour(L.ox);
   if (L.etch > 0) c = mix(c, mix(oxideColour(L.ox - L.etch), si, L.etch / Math.max(1, L.ox)), 0.5);
-  if (L.resist > 0) c = mix(c, hex('#b5482e'), 0.75 * (L.resist / (resistThk(REC.resist.rpm) * 1000)));
-  if (L.al > 0) c = mix(c, hex('#dfe3e8'), clamp(L.al / REC.al.opaque));
+  if (L.resist > 0) c = mix(c, hex('#00358E'), 0.75 * (L.resist / (resistThk(REC.resist.rpm) * 1000)));
+  if (L.al > 0) c = mix(c, hex('#E0E5EC'), clamp(L.al / REC.al.opaque));
   return c;
 }
 
@@ -407,7 +405,7 @@ export const LESSONS = (() => {
       title: 'Follow one wafer through a chip lab',
       what: `A wafer is a thin, shiny disc of pure silicon, ${WAFER.d * 1000} mm across and about half a millimetre thick (roughly five sheets of paper). Computer chips are built on wafers like this one. You will design a simple pattern, put on a cleanroom suit, then take the wafer through ${STEPS.length} steps that print the pattern and coat it with metal.`,
       why: 'This is the same basic process used to make the chips in phones and laptops, just with fewer layers and much bigger features.',
-      watch: `At each station, read the card, then click the glowing control on the machine to run it yourself. When the step finishes, answer the short quiz. At the end you get a grade; ${PASS}% or more completes the training.`,
+      watch: `At each station, read the card, then click the glowing control on the machine to run it yourself. When the step finishes, answer the check for understanding: you have ${CHECK_SECONDS} seconds per question, and every answer is scored and timed. At the end you get a grade; ${PASS}% or more completes the training.`,
     },
     design: {
       kicker: 'Before the cleanroom',
@@ -436,7 +434,7 @@ export const LESSONS = (() => {
       title: 'Grow a glass layer',
       what: `The wafer stands in a quartz holder and slides into a tube heated to ${fx(REC.ox.T)} °C and filled with steam. At that heat, silicon on the surface reacts with oxygen and turns into silicon dioxide, the same material as glass and quartz sand. Growing a ${fx(REC.ox.target * 1000)} nm layer takes about ${fx(step('oxide').dur)} minutes.`,
       why: 'Silicon dioxide is an insulator: electricity cannot flow through it. It will hold our pattern and keep the metal from touching the silicon underneath. A nanometre (nm) is a thousandth of a micrometre.',
-      watch: 'The layer grows fast at first, then slower, because oxygen has to push through the glass that is already there. Watch the growth rate drop. The wafer also changes colour as the layer thickens, the same effect that makes soap bubbles colourful.',
+      watch: 'The layer grows fast at first, then slower, because oxygen has to push through the glass that is already there. Watch the growth rate drop. The wafer changes colour as the layer thickens; on a real wafer the glass shows bright colours, the same effect that makes soap bubbles colourful.',
       act: {at: [-1.0, 1.22, 0.05], label: 'Push the boat into the furnace', ok: 'Boat moving into the 1,100 °C tube'},
     },
     spin: {

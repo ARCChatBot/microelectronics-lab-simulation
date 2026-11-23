@@ -120,7 +120,7 @@ export function createUI(app) {
       y -= ox;
       const rs = (open ? L.resistWindow : L.resist) * pxNm;
       if (rs > 0.2) {
-        g.fillStyle = open && L.doseK > 0 ? `rgb(${Math.round(197 + 40 * L.doseK)},${Math.round(85 + 90 * L.doseK)},${Math.round(58 + 60 * L.doseK)})` : '#c5553a';
+        g.fillStyle = open && L.doseK > 0 ? `rgb(${Math.round(164 * L.doseK)},${Math.round(53 + 127 * L.doseK)},${Math.round(142 + 66 * L.doseK)})` : '#00358E';
         g.fillRect(x, y - rs, w, rs);
         y -= rs;
       }
@@ -137,7 +137,7 @@ export function createUI(app) {
     g.lineWidth = 2;
     g.strokeRect(x0, base, span, 52);
     // the key
-    const key = [['#A6AFC1', 'Al', L.al, 'nm'], ['#c5553a', 'resist', L.resist / 1000, 'µm'], ['#73C5FB', 'SiO2', L.ox, 'nm']];
+    const key = [['#A6AFC1', 'Al', L.al, 'nm'], ['#00358E', 'resist', L.resist / 1000, 'µm'], ['#73C5FB', 'SiO2', L.ox, 'nm']];
     key.forEach(([c, name, v, unit], i) => {
       const y = 14 + i * 62;
       g.fillStyle = c;
